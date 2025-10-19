@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>跳动的爱心粒子动画（带紫色底部反射）</title>
+<title>跳动的爱心粒子动画</title>
 <style>
   body {margin:0; background:black; overflow:hidden;}
   canvas {display:block; margin:0 auto;}
@@ -23,12 +23,6 @@ const CENTER_Y = CANVAS_HEIGHT / 2;
 const IMAGE_ENLARGE = 11;
 const HEART_COLOR = "#FFC0CB";
 
-// 紫色粒子底参数
-const GROUND_COLOR = "#C48BFF";
-const GROUND_PARTICLES = [];
-const GROUND_COUNT = 1500;
-
-// ❤️ 爱心函数
 function heartFunction(t, shrink=IMAGE_ENLARGE){
     const x = 16 * Math.pow(Math.sin(t),3);
     const y = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
@@ -54,7 +48,6 @@ function curve(p){
     return 2 * (2 * Math.sin(4*p)) / (2*Math.PI);
 }
 
-// ❤️ Heart类
 class Heart {
     constructor(frames=20){
         this.points = [];
@@ -96,7 +89,6 @@ class Heart {
         const haloNumber = Math.floor(3000 + 4000*Math.pow(Math.abs(curve(frame/10*Math.PI)),2));
         const allPoints = [];
 
-        // 光晕层
         const haloSet = new Set();
         for(let i=0; i<haloNumber; i++){
             const t = Math.random()*Math.PI*2;
@@ -112,7 +104,6 @@ class Heart {
             }
         }
 
-        // 主心形层
         for(let [x,y] of this.points){
             [x,y] = this.calcPosition(x,y,ratio);
             allPoints.push([x,y,Math.floor(Math.random()*3)+1]);
@@ -138,47 +129,14 @@ class Heart {
     }
 }
 
-// 💜 底部粒子生成
-function initGroundParticles(){
-    for(let i=0;i<GROUND_COUNT;i++){
-        GROUND_PARTICLES.push({
-            x: Math.random()*CANVAS_WIDTH,
-            y: CANVAS_HEIGHT*0.8 + Math.random()*80,
-            size: Math.random()*2 + 0.5,
-            baseY: CANVAS_HEIGHT*0.8 + Math.random()*80,
-            phase: Math.random()*Math.PI*2
-        });
-    }
-}
-
-// 💜 绘制底部波动层
-function renderGround(ctx, time){
-    ctx.globalCompositeOperation = "lighter";
-    for(let p of GROUND_PARTICLES){
-        const dy = Math.sin(time + p.phase)*3; // 轻微波动
-        ctx.fillStyle = GROUND_COLOR;
-        ctx.globalAlpha = 0.4 + Math.sin(time + p.phase)*0.2;
-        ctx.fillRect(p.x, p.baseY + dy, p.size, p.size);
-    }
-    ctx.globalAlpha = 1.0;
-}
-
-// ❤️ 主动画
 const heart = new Heart();
-initGroundParticles();
-
 let frame = 0;
-let time = 0;
-
 function draw(){
     ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
-    renderGround(ctx, time);   // 先绘制底部波动层
-    heart.render(ctx, frame);  // 再绘制爱心粒子层
+    heart.render(ctx, frame);
     frame++;
-    time += 0.05;
     setTimeout(draw, 160);
 }
-
 draw();
 </script>
 </body>
